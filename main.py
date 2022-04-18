@@ -119,12 +119,15 @@ async def on_message(message):
             name = strip_name(message.author)
             message_to_send = get_stripped_message(message.content)
             await message.channel.send(message_to_send + name)
+            
         if "ඞ" in message.content:
             await message.channel.send(f'podejrzane')
+
         if "potek" in message.content.lower():
             name = strip_name(message.author)
             message_to_send = reminder()
             await message.channel.send(message_to_send + " " + name + "!")
+            
         if "nie dam rady" in message.content.lower():
             name = strip_name(message.author)
             await message.channel.send("Dasz radę " + name + "!")
