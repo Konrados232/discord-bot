@@ -6,8 +6,9 @@ class Waiter:
     def __init__(self, release_dates):
         self.release_dates = release_dates
 
+
     def add_date(self, name, date, developer):
-        if any(d['name'] == name for d in self.release_dates):
+        if self.name_exists(name):
             print("Game already exists.")
             return
 
@@ -22,7 +23,7 @@ class Waiter:
                 
 
     def delete_date(self, name, date, developer):
-        if not any(d['name'] == name for d in self.release_dates):
+        if not self.name_exists(name):
             print("Game doesn't exist.")
             return
         
@@ -34,31 +35,54 @@ class Waiter:
 
         self.release_dates.remove(temp_date)
         print("Game deleted.")
+    
 
-    def release_date_time(self, name):
-        time_now = datetime.now()
-        game_release_date = datetime(2022, 2, 25, 0, 0, 0)
+    def name_exists(self, name):
+        return any(d['name'] == name for d in self.release_dates)
+   
 
-        time_between = game_release_date - time_now
-
-        time_in_seconds = time_between.total_seconds()
-
+    def split_seconds_to_tuple(self, time_in_seconds):
         days = divmod(time_in_seconds, 86400)
         hours = divmod(days[1], 3600)
         minutes = divmod(hours[1], 60)
         seconds = divmod(minutes[1], 1)
+        
+        return (int(days[0]), int(hours[0]), int(minutes[0]), int(seconds[0]))
+
+
+    def release_date_time(self, name):
+        if not self.name_exists(name):
+            return "Jakiej gry? O_o"
+
+        release_date_dict = next((item for item in self.release_dates if item["name"] == name), False)
+
+        time_now = datetime.now()
+        game_release_date = datetime.strptime(release_date_dict["release_date"], "%d.%m.%Y")
+
+        time_between = game_release_date - time_now
+        time_in_seconds = time_between.total_seconds()
+
         if time_in_seconds < 0:
-            return_message = f"Już jest, czas na gamin"
-        else:
-            if int(days[0]) == 1:
-                return_message = f"Elden Ring będzie za {int(days[0])} dzień, {int(hours[0])} godzin, {int(minutes[0])} minut i {int(seconds[0])} sekund"
-            elif int(days[0]) == 0:
-                return_message = f"Elden Ring będzie za {int(hours[0])} godzin, {int(minutes[0])} minut i {int(seconds[0])} sekund"
-                if int(hours[0]) == 0:
-                    return_message = f"Elden Ring będzie za {int(minutes[0])} minut i {int(seconds[0])} sekund"
-                    if int(minutes[0]) == 0:
-                        return_message = f"Elden Ring będzie za {int(seconds[0])} sekund"
-            else:
-                return_message = f"Elden Ring będzie za {int(days[0])} dni, {int(hours[0])} godzin, {int(minutes[0])} minut i {int(seconds[0])} sekund"
+            return "Już jest, czas na gamin!" 
+
+        days, hours, minutes, seconds = self.split_seconds_to_tuple(time_in_seconds)
+
+        return_message = f"{seconds} sekund"
+
+        print(return_message)
+
+        if minutes != 0:
+            return_message = f"{minutes} minut i " + return_message
+
+        if hours != 0:
+            return_message = f"{hours} godzin, " + return_message
+
+        if days != 0:
+            return_message = f"{days} dni, " + return_message
+        
+        if days == 1:
+            return_message = f"{days} dzień, " + return_message
+
+        print(return_message)
 
         return return_message
