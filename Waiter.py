@@ -1,13 +1,45 @@
 import time
 from datetime import datetime
 
+
 class Waiter:
+    def __init__(self, release_dates):
+        self.release_dates = release_dates
 
-    def elden_ring_time(self):
+    def add_date(self, name, date, developer):
+        if any(d['name'] == name for d in self.release_dates):
+            print("Game already exists.")
+            return
+
+        new_date = {
+        "name": name,
+        "release_date": date,
+        "developer": developer
+        }
+
+        self.release_dates.append(new_date)
+        print("Game added.") 
+                
+
+    def delete_date(self, name, date, developer):
+        if not any(d['name'] == name for d in self.release_dates):
+            print("Game doesn't exist.")
+            return
+        
+        temp_date = {
+            "name": name,
+            "release_date": date,
+            "developer": developer
+        }
+
+        self.release_dates.remove(temp_date)
+        print("Game deleted.")
+
+    def release_date_time(self, name):
         time_now = datetime.now()
-        elden_ring_premiere = datetime(2022, 2, 25, 0, 0, 0)
+        game_release_date = datetime(2022, 2, 25, 0, 0, 0)
 
-        time_between = elden_ring_premiere - time_now
+        time_between = game_release_date - time_now
 
         time_in_seconds = time_between.total_seconds()
 
