@@ -9,6 +9,9 @@ from datetime import datetime
 from GameScraper import GameScraper
 from Waiter import Waiter
 
+#TO-DO -> 
+# move useful methods to other file/class
+# reorganize commands
 
 # refreshed, currently unused
 """
@@ -62,23 +65,37 @@ def super_randomize():
 def reminder():
     return "Pamiętaj o potku"
 
-
 def read_release_date_data():
     with open('datafiles/release_dates.json', 'r') as f:
         data = json.load(f)['dates']
     return data
 
+def split_sentence_combination(sentence):
+    every_word = sentence.split()
+    every_word = [a.lower() for a in every_word]
+    return every_word
+
+def check_name_mention(reminder_list, sentence):
+    for d in reminder_list:
+        splitted_name = split_sentence_combination(d['name'])
+        
+        for part in splitted_name:
+            if not part.isdigit() and part in sentence:
+                return d['name']
+    
+    return None
+
 
 client = discord.Client()
+data_read = read_release_date_data()
 valheim = GameScraper()
+waiter = Waiter(data_read)
 
-release_dates = [ ]
 
 
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
-    release_dates = read_release_date_data()
     
 
 
@@ -131,7 +148,7 @@ async def on_message(message):
             await message.channel.send(message_to_send + name)
             
         if "ඞ" in message.content:
-            await message.channel.send(f'podejrzane')
+            await message.channel.send("podejrzane")
 
         if "potek" in message.content.lower():
             name = strip_name(message.author)
@@ -142,17 +159,20 @@ async def on_message(message):
             name = strip_name(message.author)
             await message.channel.send("Dasz radę " + name + "!")
 
+        if "kiedy" in message.content.lower() or "za ile" in message.content.lower():
+            title = check_name_mention(waiter.get_release_dates(), message.content.lower())
+            print(title)
+            if title is not None:
+                message_to_send = waiter.release_date_time(name=title)
+                await message.channel.send(f"{message_to_send} {message.author.mention}!")
+
         if "elden ring" in message.content.lower() or "elden" in message.content.lower():
             if "kiedy" in message.content.lower() or "za ile" in message.content.lower():
-                waiter = Waiter()
-                message_to_send = waiter.elden_ring_time()
+                message_to_send = waiter.release_date_time()
                 await message.channel.send(f"{message_to_send} {message.author.mention}!")
-            else:
-                await message.channel.send(f"OOOOOOHHHHHH ELDEN RING!")
 
         if "konradobocie" in message.content.lower() and "co robiłeś, że cię nie było" in message.content.lower():
             await message.channel.send(f"Czytałem lore Dark Souls")
-
 
 
 
