@@ -1,7 +1,6 @@
 import time
 from datetime import datetime
 
-
 class Waiter:
     def __init__(self, release_dates):
         self.release_dates = release_dates
@@ -10,7 +9,7 @@ class Waiter:
     def add_date(self, name, date, developer):
         if self.name_exists(name):
             print("Game already exists.")
-            return
+            return "Już taka gra jest!"
 
         new_date = {
         "name": name,
@@ -20,12 +19,13 @@ class Waiter:
 
         self.release_dates.append(new_date)
         print("Game added.") 
+        return "Gra dodana!"
                 
 
     def delete_date(self, name, date, developer):
         if not self.name_exists(name):
             print("Game doesn't exist.")
-            return
+            return "Nie da się usunąć czegoś, co nie istnieje... Chyba"
         
         temp_date = {
             "name": name,
@@ -34,7 +34,9 @@ class Waiter:
         }
 
         self.release_dates.remove(temp_date)
+
         print("Game deleted.")
+        return "Istnienie tej gry przestało funkcjonować"
     
 
     def name_exists(self, name):
@@ -69,8 +71,6 @@ class Waiter:
 
         return_message = f"{seconds} sekund"
 
-        print(return_message)
-
         if minutes != 0:
             return_message = f"{minutes} minut i " + return_message
 
@@ -83,6 +83,7 @@ class Waiter:
         if days == 1:
             return_message = f"{days} dzień, " + return_message
 
-        print(return_message)
-
         return return_message
+
+    def get_release_dates(self):
+        return self.release_dates
