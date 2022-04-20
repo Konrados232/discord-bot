@@ -1,4 +1,13 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
 notes.txt
 .vscode
 secretkey
+venv/
 venv
+
+# temporary
+datafiles/
