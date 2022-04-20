@@ -2,6 +2,7 @@ import discord
 import random
 import threading
 import time
+import json
 import traceback
 from datetime import datetime
 #from Scrap import Scrap
@@ -62,14 +63,23 @@ def reminder():
     return "Pamiętaj o potku"
 
 
+def read_release_date_data():
+    with open('datafiles/release_dates.json', 'r') as f:
+        data = json.load(f)['dates']
+    return data
+
+
 client = discord.Client()
 valheim = GameScraper()
+
+release_dates = [ ]
 
 
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
-   
+    release_dates = read_release_date_data()
+    
 
 
 @client.event
