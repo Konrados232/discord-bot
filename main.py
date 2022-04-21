@@ -65,21 +65,24 @@ def super_randomize():
 def reminder():
     return "Pamiętaj o potku"
 
-def read_release_date_data():
+def read_release_date_data_json():
     with open('datafiles/release_dates.json', 'r') as f:
-        data = json.load(f)['dates']
+        data = json.load(f)
     return data
 
 def split_sentence_combination(sentence):
     every_word = sentence.split()
-    every_word = [a.lower() for a in every_word]
+    every_word = [a for a in every_word]
     return every_word
 
 def check_name_mention(reminder_list, sentence):
+    print(reminder_list)
+    print(sentence)
     for d in reminder_list:
         splitted_name = split_sentence_combination(d['name'])
-        
+        print(d)
         for part in splitted_name:
+            print(part)
             if not part.isdigit() and part in sentence:
                 return d['name']
     
@@ -87,7 +90,7 @@ def check_name_mention(reminder_list, sentence):
 
 
 client = discord.Client()
-data_read = read_release_date_data()
+data_read = read_release_date_data_json()
 valheim = GameScraper()
 waiter = Waiter(data_read)
 
@@ -140,6 +143,26 @@ async def on_message(message):
         if message.content.startswith('!val craft'):
             big_message = valheim.get_item_info(strip_message(message.content))
             await message.channel.send(f"Here's you recipe {message.author.mention} ```{big_message}```")
+
+        #TO-DO refactor
+        if message.content.startswith("!release add"):
+            contents = message.content.split()
+            date = next(x for x in contents if "." in x)
+            date_index = contents.index(date)
+            title = " ".join(contents[2:date_index])
+            developer = " ".join(contents[date_index+1:])
+
+            message_to_send = waiter.add_date(title, date, developer)
+            await message.channel.send(message_to_send)
+        if message.content.startswith("!release delete"):
+            contents = message.content.split()
+            date = next(x for x in contents if "." in x)
+            date_index = contents.index(date)
+            title = " ".join(contents[2:date_index])
+            developer = " ".join(contents[date_index+1:])
+
+            message_to_send = waiter.delete_date(title, date, developer)
+            await message.channel.send(message_to_send)
     else:
 
         if "bocie" in message.content and "konradobocie" not in message.content:
@@ -160,15 +183,10 @@ async def on_message(message):
             await message.channel.send("Dasz radę " + name + "!")
 
         if "kiedy" in message.content.lower() or "za ile" in message.content.lower():
-            title = check_name_mention(waiter.get_release_dates(), message.content.lower())
+            title = check_name_mention(waiter.get_release_dates(), message.content)
             print(title)
             if title is not None:
                 message_to_send = waiter.release_date_time(name=title)
-                await message.channel.send(f"{message_to_send} {message.author.mention}!")
-
-        if "elden ring" in message.content.lower() or "elden" in message.content.lower():
-            if "kiedy" in message.content.lower() or "za ile" in message.content.lower():
-                message_to_send = waiter.release_date_time()
                 await message.channel.send(f"{message_to_send} {message.author.mention}!")
 
         if "konradobocie" in message.content.lower() and "co robiłeś, że cię nie było" in message.content.lower():
