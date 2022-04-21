@@ -1,16 +1,23 @@
 import time
 from datetime import datetime
+import json
 
 class Waiter:
-    def __init__(self, release_dates):
-        self.release_dates = release_dates
+    def __init__(self, json_file):
+        self.json_file = json_file
+        self.release_dates = json_file['dates']
 
 
     def add_date(self, name, date, developer):
+        if not self.validate_date(date):
+            print("Wrong date format.")
+            return "Źle podana data!"
+
         if self.name_exists(name):
             print("Game already exists.")
             return "Już taka gra jest!"
 
+        print("hello")
         new_date = {
         "name": name,
         "release_date": date,
@@ -18,6 +25,7 @@ class Waiter:
         }
 
         self.release_dates.append(new_date)
+        self.write_to_json()
         print("Game added.") 
         return "Gra dodana!"
                 
@@ -34,10 +42,22 @@ class Waiter:
         }
 
         self.release_dates.remove(temp_date)
-
+        self.write_to_json()
         print("Game deleted.")
         return "Istnienie tej gry przestało funkcjonować"
     
+    def write_to_json(self):
+        self.json_file['dates'] = self.release_dates
+        print(self.json_file)
+        with open('datafiles/release_dates.json', 'w') as f:
+            json.dump(self.json_file, f)
+            
+
+    def validate_date(self, date):
+        try:
+            return bool(datetime.strptime(date, "%d.%m.%Y"))
+        except ValueError:
+            return False
 
     def name_exists(self, name):
         return any(d['name'] == name for d in self.release_dates)
