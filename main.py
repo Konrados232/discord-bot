@@ -1,4 +1,5 @@
 import discord
+from discord.ext import commands
 import random
 import threading
 import time
@@ -89,113 +90,147 @@ def check_name_mention(reminder_list, sentence):
     return None
 
 
-client = discord.Client()
+#client = discord.Client()
+intents = discord.Intents.default()
+intents.members = True
+
+bot = commands.Bot(command_prefix="!", intents=intents)
+
 data_read = read_release_date_data_json()
 valheim = GameScraper()
 waiter = Waiter(data_read)
 
 
 
-@client.event
+@bot.event
 async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
+    print(f"We have logged in as {bot.user}")
+    
+@bot.event
+async def on_message(message):
+    await bot.process_commands(message)
+    
+    if message.author == bot.user:
+        return
+
+    if super_randomize() == 42:
+       await message.channel.send("Randomowa wiadomość!")
+
+    if "bocie" in message.content and "konradobocie" not in message.content:
+        name = strip_name(message.author)
+        message_to_send = get_stripped_message(message.content)
+        await message.channel.send(message_to_send + name)
+        
+    if "ඞ" in message.content or "U+0D9E" in message.content or "u0D9E" in message.content:
+        await message.channel.send("podejrzane")
+
+    if "potek" in message.content.lower():
+        name = strip_name(message.author)
+        message_to_send = reminder()
+        await message.channel.send(message_to_send + " " + name + "!")
+        
+    if "nie dam rady" in message.content.lower():
+        name = strip_name(message.author)
+        await message.channel.send("Dasz radę " + name + "!")
+
+    if "kiedy" in message.content.lower() or "za ile" in message.content.lower():
+        title = check_name_mention(waiter.get_release_dates(), message.content)
+        print(title)
+        if title is not None:
+            message_to_send = waiter.release_date_time(name=title)
+            await message.channel.send(f"{message_to_send} {message.author.mention}!")
+
+    if "konradobocie" in message.content.lower() and "co robiłeś, że cię nie było" in message.content.lower():
+        await message.channel.send(f"Czytałem lore Dark Souls")
+
+
+
+@bot.command()
+async def hello(ctx):
+    await ctx.send(f"Hello {ctx.author.mention}!")
+
+@bot.command(name="random")
+async def generate_random_number(ctx):
+    await ctx.channel.send(str(randomize()) + "!")
+
+
+@bot.group()
+async def konradobot(ctx):
+    if ctx.invoked_subcommand is None:
+        await ctx.send("A witam")
+
+@konradobot.command()
+async def przedmioty(ctx):
+    # currently obsolete, prints default message instead
+    #x = Scrap()
+    #big_message = x.do_command()
+    #await message.channel.send(f"Spis przedmiotów {message.author.mention} ```{big_message}```")
+    await ctx.channel.send("Obecnie niedostępne.")
+
+@bot.group()
+async def konradobocie(ctx):
+    if ctx.invoked_subcommand is None:
+        await ctx.send("No hej?")
+
+@konradobocie.command(name="czy")
+async def whether(ctx, message_content):
+    if "popiera" in message_content or "popierasz" in message_content:
+        await ctx.channel.send("Nikogo nie popieram, bo jestem botem")
+        return
+    random_number = randomize()
+    this_message = ""
+    if random_number < 25:
+        this_message = "Jak najbardziej"
+    elif 25 <= random_number < 50:
+        this_message = "No w sumie czemu nie"
+    elif 50 <= random_number < 75:
+        this_message = "Kurde no ciężko stwierdzić"
+    else:
+        this_message = "Tylko nie to"
+    await ctx.channel.send(this_message)
     
 
+@bot.group()
+async def val(ctx):
+    if ctx.invoked_subcommand is None:
+        await ctx.send("Unknown command.")
 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
-    if super_randomize() == 42:
-        await message.channel.send(f'Randomowa wiadomość!')
-    if message.content.startswith('!'):
-        if message.content.startswith('!hello'):
-            # name = strip_name(message.author)
-            await message.channel.send(f'Hello {message.author.mention}!')
+@val.command()
+async def craft(ctx, *message_content: str):
+    print(message_content)
+    big_message = valheim.get_item_info(list(message_content))
+    await ctx.channel.send(f"Here's you recipe {ctx.author.mention} ```{big_message}```")
 
-        if message.content.startswith('!random'):
-            random_number = randomize()
-            await message.channel.send(str(random_number) + "!")
+@bot.group()
+async def release(ctx):
+    if ctx.invoked_subcommand is None:
+        await ctx.send("Unknown command.")
 
-        if message.content.startswith('!konradobot przedmioty'):
-            # currently obsolete, prints default message instead
-            #x = Scrap()
-            #big_message = x.do_command()
-            #await message.channel.send(f'Spis przedmiotów {message.author.mention} ```{big_message}```')
-            await message.channel.send(f'Obecnie niedostępne')
 
-        if message.content.startswith('!konradobocie czy'):
-            if "popiera" in message.content.lower() or "popierasz" in message.content.lower():
-                await message.channel.send(f"Nikogo nie popieram, bo jestem botem")
-                return
-            random_number = randomize()
-            this_message = ""
-            if random_number < 25:
-                this_message = "Jak najbardziej"
-            elif 25 <= random_number < 50:
-                this_message = "No w sumie czemu nie"
-            elif 50 <= random_number < 75:
-                this_message = "Kurde no ciężko stwierdzić"
-            else:
-                this_message = "Tylko nie to"
-            await message.channel.send(f'{this_message}')
+#TO-DO refactor
+@release.command()
+async def add(ctx, *message_content: str):
+    date = next(x for x in message_content if "." in x)
+    date_index = message_content.index(date)
+    title = " ".join(message_content[2:date_index])
+    developer = " ".join(message_content[date_index+1:])
 
-        if message.content.startswith('!val craft'):
-            big_message = valheim.get_item_info(strip_message(message.content))
-            await message.channel.send(f"Here's you recipe {message.author.mention} ```{big_message}```")
+    message_to_send = waiter.add_date(title, date, developer)
+    await ctx.channel.send(message_to_send)
 
-        #TO-DO refactor
-        if message.content.startswith("!release add"):
-            contents = message.content.split()
-            date = next(x for x in contents if "." in x)
-            date_index = contents.index(date)
-            title = " ".join(contents[2:date_index])
-            developer = " ".join(contents[date_index+1:])
+@release.command()
+async def delete(ctx, *message_content: str):
+    date = next(x for x in message_content if "." in x)
+    date_index = message_content.index(date)
+    title = " ".join(message_content[2:date_index])
+    developer = " ".join(message_content[date_index+1:])
 
-            message_to_send = waiter.add_date(title, date, developer)
-            await message.channel.send(message_to_send)
-        if message.content.startswith("!release delete"):
-            contents = message.content.split()
-            date = next(x for x in contents if "." in x)
-            date_index = contents.index(date)
-            title = " ".join(contents[2:date_index])
-            developer = " ".join(contents[date_index+1:])
-
-            message_to_send = waiter.delete_date(title, date, developer)
-            await message.channel.send(message_to_send)
-    else:
-
-        if "bocie" in message.content and "konradobocie" not in message.content:
-            name = strip_name(message.author)
-            message_to_send = get_stripped_message(message.content)
-            await message.channel.send(message_to_send + name)
-            
-        if "ඞ" in message.content:
-            await message.channel.send("podejrzane")
-
-        if "potek" in message.content.lower():
-            name = strip_name(message.author)
-            message_to_send = reminder()
-            await message.channel.send(message_to_send + " " + name + "!")
-            
-        if "nie dam rady" in message.content.lower():
-            name = strip_name(message.author)
-            await message.channel.send("Dasz radę " + name + "!")
-
-        if "kiedy" in message.content.lower() or "za ile" in message.content.lower():
-            title = check_name_mention(waiter.get_release_dates(), message.content)
-            print(title)
-            if title is not None:
-                message_to_send = waiter.release_date_time(name=title)
-                await message.channel.send(f"{message_to_send} {message.author.mention}!")
-
-        if "konradobocie" in message.content.lower() and "co robiłeś, że cię nie było" in message.content.lower():
-            await message.channel.send(f"Czytałem lore Dark Souls")
-
+    message_to_send = waiter.delete_date(title, date, developer)
+    await ctx.channel.send(message_to_send)
 
 
 with open("secretkey") as f:
     secret_key = f.readline()
 
 
-client.run(secret_key)
+bot.run(secret_key)
