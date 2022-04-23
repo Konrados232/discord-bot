@@ -9,6 +9,8 @@ from datetime import datetime
 #from Scrap import Scrap
 from GameScraper import GameScraper
 from Waiter import Waiter
+from Snipe import Snipe
+
 
 #TO-DO -> 
 # move useful methods to other file/class
@@ -99,12 +101,15 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 data_read = read_release_date_data_json()
 valheim = GameScraper()
 waiter = Waiter(data_read)
+snipe_class = Snipe(bot)
 
+bot.add_cog(snipe_class)
 
 
 @bot.event
 async def on_ready():
     print(f"We have logged in as {bot.user}")
+
     
 @bot.event
 async def on_message(message):
@@ -112,7 +117,7 @@ async def on_message(message):
     
     if message.author == bot.user:
         return
-
+        
     if super_randomize() == 42:
        await message.channel.send("Randomowa wiadomość!")
 
@@ -143,6 +148,10 @@ async def on_message(message):
     if "konradobocie" in message.content.lower() and "co robiłeś, że cię nie było" in message.content.lower():
         await message.channel.send(f"Czytałem lore Dark Souls")
 
+
+@bot.command()
+async def snipe(ctx):
+    await ctx.channel.send(snipe_class.get_snipe_message(ctx.channel.id))
 
 
 @bot.command()
