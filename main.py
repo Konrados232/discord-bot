@@ -151,7 +151,7 @@ async def on_message(message):
 
 @bot.command()
 async def snipe(ctx):
-    await ctx.channel.send(snipe_class.get_snipe_message(ctx.channel.id))
+    await ctx.channel.send(embed=snipe_class.get_snipe_embed(ctx.channel.id))
 
 
 @bot.command()
