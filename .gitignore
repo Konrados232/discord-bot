@@ -8,6 +8,7 @@ notes.txt
 secretkey
 venv/
 venv
+cspell.json
 
 # temporary
 datafiles/

@@ -12,6 +12,7 @@ from Waiter import Waiter
 from Snipe import Snipe
 
 
+
 #TO-DO -> 
 # move useful methods to other file/class
 # reorganize commands
@@ -151,7 +152,8 @@ async def on_message(message):
 
 @bot.command()
 async def snipe(ctx):
-    await ctx.channel.send(embed=snipe_class.get_snipe_embed(ctx.channel.id))
+    embed_to_send = snipe_class.get_snipe_embed(ctx.channel.id)
+    await ctx.send(embed=embed_to_send)
 
 
 @bot.command()
@@ -221,7 +223,7 @@ async def release(ctx):
 async def add(ctx, *message_content: str):
     date = next(x for x in message_content if "." in x)
     date_index = message_content.index(date)
-    title = " ".join(message_content[2:date_index])
+    title = " ".join(message_content[:date_index])
     developer = " ".join(message_content[date_index+1:])
 
     message_to_send = waiter.add_date(title, date, developer)

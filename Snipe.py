@@ -13,22 +13,26 @@ class Snipe(commands.Cog):
         channel_id = message.channel.id
         print(channel_id)
         avatar = message.author.avatar_url
-        author = f"{message.author.name}"
-        content = f"{message.content}"
+        author = message.author.name
+        content = message.content
         date = message.created_at
         self.deleted_messages[channel_id] = (author, content, date, avatar)
 
     def get_snipe_embed(self, channel_id):
+        print(channel_id)
         if self.deleted_messages[channel_id] == None:
             return "There is nothing to snipe."
 
-        title = f"{self.deleted_messages[channel_id][0]}:"
+        author_title = f"{self.deleted_messages[channel_id][0]}:"
+        time_deleted =  datetime.strftime(self.deleted_messages[channel_id][2], "%d.%m.%Y %H:%M:%S")
         color = 0x00ff00
-
-        embed = discord.Embed(title=title, color=color)
-        embed.add_field(name="", value=f"{self.deleted_messages[channel_id][1]}", inline=False)
-        embed.set_footer(text=f"{self.deleted_messages[channel_id][2]}")
-        embed.set_thumbnail(url=self.deleted_messages[channel_id][3])
+       
+        embed = discord.Embed(color=color)
+        embed.set_author(name=author_title, icon_url=self.deleted_messages[channel_id][3])
+        # this character makes name dissapear
+        embed.add_field(name="\u200b", value=self.deleted_messages[channel_id][1], inline=False)
+        embed.set_footer(text=time_deleted)
+        #embed.set_thumbnail(url=self.deleted_messages[channel_id][3])
 
         return embed
     
