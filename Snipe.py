@@ -27,10 +27,9 @@ class Snipe(commands.Cog):
         time_deleted =  datetime.strftime(self.deleted_messages[channel_id][2], "%d.%m.%Y %H:%M:%S")
         color = 0x00ff00
        
-        embed = discord.Embed(color=color)
+        # message must be description in order not to have a gap
+        embed = discord.Embed(color=color, description=self.deleted_messages[channel_id][1])
         embed.set_author(name=author_title, icon_url=self.deleted_messages[channel_id][3])
-        # this character makes name dissapear
-        embed.add_field(name="\u200b", value=self.deleted_messages[channel_id][1], inline=False)
         embed.set_footer(text=time_deleted)
         #embed.set_thumbnail(url=self.deleted_messages[channel_id][3])
 
