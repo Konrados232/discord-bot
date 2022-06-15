@@ -1,12 +1,13 @@
 import discord
 from discord.ext import commands
-from collections import namedtuple
 from datetime import datetime
+
 
 class Snipe(commands.Cog):
     def __init__(self, bot):
         self.deleted_messages = { }
         self.bot = bot
+
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
@@ -17,6 +18,7 @@ class Snipe(commands.Cog):
         content = message.content
         date = message.created_at
         self.deleted_messages[channel_id] = (author, content, date, avatar)
+
 
     def get_snipe_embed(self, channel_id):
         print(channel_id)

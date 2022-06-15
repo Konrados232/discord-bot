@@ -6,6 +6,9 @@ import time
 import json
 import traceback
 from datetime import datetime
+from APIs.HowLongToBeatAPICleaner import HowLongToBeatAPICleaner
+from APIs.HowLongToBeatAPIHandler import HowLongToBeatAPIHandler
+from APIs.HowLongToBeatEmbed import HowLongToBeatEmbed
 #from Scrap import Scrap
 from GameScraper import GameScraper
 from Waiter import Waiter
@@ -17,26 +20,7 @@ from Snipe import Snipe
 # move useful methods to other file/class
 # reorganize commands
 
-# refreshed, currently unused
-"""
-def every(delay, task):
-  next_time = time.time() + delay
-  while True:
-    time.sleep(max(0, next_time - time.time()))
-    try:
-      task()
-    except Exception:
-      traceback.print_exc()
-      # in production code you might want to have this instead of course:
-      # logger.exception("Problem while executing repetitive task.")
-    # skip tasks if we are behind schedule:
-    next_time += (time.time() - next_time) // delay * delay + delay
 
-def refresh_message():
-  print("refresh", time.time())
-
-   #threading.Thread(target=lambda: every(500, refresh_message)).start()
-"""
 
 
 # useful methods
@@ -102,9 +86,22 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 data_read = read_release_date_data_json()
 valheim = GameScraper()
 waiter = Waiter(data_read)
-snipe_class = Snipe(bot)
 
+snipe_class = Snipe(bot)
 bot.add_cog(snipe_class)
+
+base_dict = {
+    "name" : "",
+    "image_url": "",
+    "gameplay_main" : "",
+    "gameplay_main_extra" : "",
+    "gameplay_completionist" : ""
+}
+
+
+hltb_handler = HowLongToBeatAPIHandler()
+hltb_cleaner = HowLongToBeatAPICleaner(base_dict)
+hltb_embed = HowLongToBeatEmbed()
 
 
 @bot.event
@@ -163,6 +160,18 @@ async def hello(ctx):
 @bot.command(name="random")
 async def generate_random_number(ctx):
     await ctx.channel.send(str(randomize()) + "!")
+
+
+@bot.command()
+async def hltb(ctx, *message_content: str):
+    joined_message = " ".join(message_content)
+    embed_to_send = ""
+    fetched_data = hltb_handler.fetch_data(joined_message)
+    if fetched_data is not None:
+        cleaned_data = hltb_cleaner.clean_data(fetched_data)
+        embed_to_send = hltb_embed.get_embed(cleaned_data)
+
+    await ctx.channel.send(embed=embed_to_send)
 
 
 @bot.group()
