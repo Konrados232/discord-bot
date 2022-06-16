@@ -11,16 +11,15 @@ from APIs.HowLongToBeatAPIHandler import HowLongToBeatAPIHandler
 from APIs.HowLongToBeatEmbed import HowLongToBeatEmbed
 #from Scrap import Scrap
 from GameScraper import GameScraper
+from HLTBCommand import HLTBCommand
+from SnipeCommand import SnipeCommand
 from Waiter import Waiter
-from Snipe import Snipe
-
+from SnipeListener import SnipeListener
 
 
 #TO-DO -> 
 # move useful methods to other file/class
 # reorganize commands
-
-
 
 
 # useful methods
@@ -87,21 +86,19 @@ data_read = read_release_date_data_json()
 valheim = GameScraper()
 waiter = Waiter(data_read)
 
-snipe_class = Snipe(bot)
-bot.add_cog(snipe_class)
+# listeners
 
-base_dict = {
-    "name" : "",
-    "image_url": "",
-    "gameplay_main" : "",
-    "gameplay_main_extra" : "",
-    "gameplay_completionist" : ""
-}
+snipe_listener = SnipeListener(bot)
+bot.add_cog(snipe_listener)
 
 
-hltb_handler = HowLongToBeatAPIHandler()
-hltb_cleaner = HowLongToBeatAPICleaner(base_dict)
-hltb_embed = HowLongToBeatEmbed()
+# commands
+snipe_command = SnipeCommand(bot, snipe_listener)
+bot.add_cog(snipe_command)
+
+
+hltb_command = HLTBCommand(bot)
+bot.add_cog(hltb_command)
 
 
 @bot.event
@@ -147,10 +144,7 @@ async def on_message(message):
         await message.channel.send(f"Czytałem lore Dark Souls")
 
 
-@bot.command()
-async def snipe(ctx):
-    embed_to_send = snipe_class.get_snipe_embed(ctx.channel.id)
-    await ctx.send(embed=embed_to_send)
+
 
 
 @bot.command()
@@ -161,17 +155,6 @@ async def hello(ctx):
 async def generate_random_number(ctx):
     await ctx.channel.send(str(randomize()) + "!")
 
-
-@bot.command()
-async def hltb(ctx, *message_content: str):
-    joined_message = " ".join(message_content)
-    embed_to_send = ""
-    fetched_data = hltb_handler.fetch_data(joined_message)
-    if fetched_data is not None:
-        cleaned_data = hltb_cleaner.clean_data(fetched_data)
-        embed_to_send = hltb_embed.get_embed(cleaned_data)
-
-    await ctx.channel.send(embed=embed_to_send)
 
 
 @bot.group()
