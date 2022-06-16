@@ -1,26 +1,19 @@
 import discord
 from discord.ext import commands
 import random
-import threading
-import time
 import json
-import traceback
-from datetime import datetime
-from APIs.HowLongToBeatAPICleaner import HowLongToBeatAPICleaner
-from APIs.HowLongToBeatAPIHandler import HowLongToBeatAPIHandler
-from APIs.HowLongToBeatEmbed import HowLongToBeatEmbed
-#from Scrap import Scrap
-from GameScraper import GameScraper
+
 from HLTBCommand import HLTBCommand
+from HelloCommand import HelloCommand
+from KonradobocieCommand import KonradobocieCommand
+from KonradobotCommand import KonradobotCommand
+from RandomCommand import RandomCommand
+from ReleaseCommand import ReleaseCommand
 from SnipeCommand import SnipeCommand
+from ValCommand import ValCommand
 from Waiter import Waiter
 from SnipeListener import SnipeListener
-
-
-#TO-DO -> 
-# move useful methods to other file/class
-# reorganize commands
-
+from Utils import Utils
 
 # useful methods
 
@@ -39,15 +32,6 @@ def strip_message(message):
     message_string = str(message)
     item_name = message_string.split("craft")[1]
     return item_name.strip()
-
-
-def randomize():
-    return random.randrange(0, 100)
-
-
-def super_randomize():
-    return random.randrange(0, 5000)
-
 
 def reminder():
     return "Pamiętaj o potku"
@@ -83,7 +67,6 @@ intents.members = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 data_read = read_release_date_data_json()
-valheim = GameScraper()
 waiter = Waiter(data_read)
 
 # listeners
@@ -93,9 +76,26 @@ bot.add_cog(snipe_listener)
 
 
 # commands
+hello_command = HelloCommand(bot)
+bot.add_cog(hello_command)
+
+random_command = RandomCommand(bot)
+bot.add_cog(random_command)
+
+konradobot_command = KonradobotCommand(bot)
+bot.add_cog(konradobot_command)
+
+konradobocie_command = KonradobocieCommand(bot)
+bot.add_cog(konradobocie_command)
+
+val_command = ValCommand(bot)
+bot.add_cog(val_command)
+
+release_command = ReleaseCommand(bot, waiter)
+bot.add_cog(release_command)
+
 snipe_command = SnipeCommand(bot, snipe_listener)
 bot.add_cog(snipe_command)
-
 
 hltb_command = HLTBCommand(bot)
 bot.add_cog(hltb_command)
@@ -143,93 +143,6 @@ async def on_message(message):
     if "konradobocie" in message.content.lower() and "co robiłeś, że cię nie było" in message.content.lower():
         await message.channel.send(f"Czytałem lore Dark Souls")
 
-
-
-
-
-@bot.command()
-async def hello(ctx):
-    await ctx.send(f"Hello {ctx.author.mention}!")
-
-@bot.command(name="random")
-async def generate_random_number(ctx):
-    await ctx.channel.send(str(randomize()) + "!")
-
-
-
-@bot.group()
-async def konradobot(ctx):
-    if ctx.invoked_subcommand is None:
-        await ctx.send("A witam")
-
-@konradobot.command()
-async def przedmioty(ctx):
-    # currently obsolete, prints default message instead
-    #x = Scrap()
-    #big_message = x.do_command()
-    #await message.channel.send(f"Spis przedmiotów {message.author.mention} ```{big_message}```")
-    await ctx.channel.send("Obecnie niedostępne.")
-
-@bot.group()
-async def konradobocie(ctx):
-    if ctx.invoked_subcommand is None:
-        await ctx.send("No hej?")
-
-@konradobocie.command(name="czy")
-async def whether(ctx, message_content):
-    if "popiera" in message_content or "popierasz" in message_content:
-        await ctx.channel.send("Nikogo nie popieram, bo jestem botem")
-        return
-    random_number = randomize()
-    this_message = ""
-    if random_number < 25:
-        this_message = "Jak najbardziej"
-    elif 25 <= random_number < 50:
-        this_message = "No w sumie czemu nie"
-    elif 50 <= random_number < 75:
-        this_message = "Kurde no ciężko stwierdzić"
-    else:
-        this_message = "Tylko nie to"
-    await ctx.channel.send(this_message)
-    
-
-@bot.group()
-async def val(ctx):
-    if ctx.invoked_subcommand is None:
-        await ctx.send("Unknown command.")
-
-@val.command()
-async def craft(ctx, *message_content: str):
-    print(message_content)
-    big_message = valheim.get_item_info(list(message_content))
-    await ctx.channel.send(f"Here's you recipe {ctx.author.mention} ```{big_message}```")
-
-@bot.group()
-async def release(ctx):
-    if ctx.invoked_subcommand is None:
-        await ctx.send("Unknown command.")
-
-
-#TO-DO refactor
-@release.command()
-async def add(ctx, *message_content: str):
-    date = next(x for x in message_content if "." in x)
-    date_index = message_content.index(date)
-    title = " ".join(message_content[:date_index])
-    developer = " ".join(message_content[date_index+1:])
-
-    message_to_send = waiter.add_date(title, date, developer)
-    await ctx.channel.send(message_to_send)
-
-@release.command()
-async def delete(ctx, *message_content: str):
-    date = next(x for x in message_content if "." in x)
-    date_index = message_content.index(date)
-    title = " ".join(message_content[2:date_index])
-    developer = " ".join(message_content[date_index+1:])
-
-    message_to_send = waiter.delete_date(title, date, developer)
-    await ctx.channel.send(message_to_send)
 
 
 with open("secretkey") as f:
