@@ -7,6 +7,7 @@ class SteamListConverter:
         self.all_list_url = r"https://api.steampowered.com/ISteamApps/GetAppList/v2/"
         self.all_games_file = r"datafiles/allgames.json"
 
+
     def _fetch_data(self):
         data = requests.get(self.all_list_url)
         return json.loads(data.text)
