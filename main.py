@@ -9,6 +9,7 @@ from Commands.KonradobotCommand import KonradobotCommand
 from Commands.RandomCommand import RandomCommand
 from Commands.ReleaseCommand import ReleaseCommand
 from Commands.SnipeCommand import SnipeCommand
+from Commands.SteamCommand import SteamCommand
 from Commands.ValCommand import ValCommand
 from Listeners.SnipeListener import SnipeListener
 from Shared.Waiter import Waiter
@@ -99,6 +100,8 @@ bot.add_cog(snipe_command)
 hltb_command = HLTBCommand(bot)
 bot.add_cog(hltb_command)
 
+steam_command = SteamCommand(bot)
+bot.add_cog(steam_command)
 
 @bot.event
 async def on_ready():
