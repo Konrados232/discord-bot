@@ -4,6 +4,7 @@ import json
 
 from Commands.HLTBCommand import HLTBCommand
 from Commands.HelloCommand import HelloCommand
+from Commands.HelpCommand import HelpCommand
 from Commands.KonradobocieCommand import KonradobocieCommand
 from Commands.KonradobotCommand import KonradobotCommand
 from Commands.RandomCommand import RandomCommand
@@ -81,6 +82,9 @@ bot.add_cog(hello_command)
 
 random_command = RandomCommand(bot)
 bot.add_cog(random_command)
+
+help_command = HelpCommand(bot)
+bot.add_cog(help_command)
 
 konradobot_command = KonradobotCommand(bot)
 bot.add_cog(konradobot_command)
