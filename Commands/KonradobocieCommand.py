@@ -1,5 +1,5 @@
 from discord.ext import commands
-from Utils import Utils
+from Shared.Utils import Utils
 
 
 class KonradobocieCommand(commands.Cog):

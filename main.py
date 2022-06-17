@@ -1,19 +1,18 @@
 import discord
 from discord.ext import commands
-import random
 import json
 
-from HLTBCommand import HLTBCommand
-from HelloCommand import HelloCommand
-from KonradobocieCommand import KonradobocieCommand
-from KonradobotCommand import KonradobotCommand
-from RandomCommand import RandomCommand
-from ReleaseCommand import ReleaseCommand
-from SnipeCommand import SnipeCommand
-from ValCommand import ValCommand
-from Waiter import Waiter
-from SnipeListener import SnipeListener
-from Utils import Utils
+from Commands.HLTBCommand import HLTBCommand
+from Commands.HelloCommand import HelloCommand
+from Commands.KonradobocieCommand import KonradobocieCommand
+from Commands.KonradobotCommand import KonradobotCommand
+from Commands.RandomCommand import RandomCommand
+from Commands.ReleaseCommand import ReleaseCommand
+from Commands.SnipeCommand import SnipeCommand
+from Commands.ValCommand import ValCommand
+from Listeners.SnipeListener import SnipeListener
+from Shared.Waiter import Waiter
+from Shared.Utils import Utils
 
 # useful methods
 
@@ -113,7 +112,7 @@ async def on_message(message):
     if message.author == bot.user:
         return
         
-    if super_randomize() == 42:
+    if Utils.super_randomize() == 42:
        await message.channel.send("Randomowa wiadomość!")
 
     if "bocie" in message.content and "konradobocie" not in message.content:

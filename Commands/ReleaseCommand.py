@@ -1,5 +1,5 @@
 from discord.ext import commands
-from Waiter import Waiter
+from Shared.Waiter import Waiter
 
 
 class ReleaseCommand(commands.Cog):

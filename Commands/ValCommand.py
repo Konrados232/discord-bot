@@ -1,5 +1,5 @@
 from discord.ext import commands
-from GameScraper import GameScraper
+from Shared.GameScraper import GameScraper
 
 
 class ValCommand(commands.Cog):

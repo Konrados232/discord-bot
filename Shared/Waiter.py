@@ -2,6 +2,7 @@ import time
 from datetime import datetime
 import json
 
+
 class Waiter:
     def __init__(self, json_file):
         self.json_file = json_file
@@ -46,6 +47,7 @@ class Waiter:
         print("Game deleted.")
         return "Istnienie tej gry przestało funkcjonować"
     
+
     def write_to_json(self):
         self.json_file['dates'] = self.release_dates
         print(self.json_file)
@@ -58,6 +60,7 @@ class Waiter:
             return bool(datetime.strptime(date, "%d.%m.%Y"))
         except ValueError:
             return False
+
 
     def name_exists(self, name):
         return any(d['name'] == name for d in self.release_dates)
@@ -79,7 +82,13 @@ class Waiter:
         release_date_dict = next((item for item in self.release_dates if item["name"] == name), False)
 
         time_now = datetime.now()
-        game_release_date = datetime.strptime(release_date_dict["release_date"], "%d.%m.%Y")
+
+        if (release_date_dict["developer"] == "Spurek" or release_date_dict["developer"] == "Omocat"):
+            game_release_date = datetime.strptime(release_date_dict["release_date"], "%d.%m.%Y.%H.%M")
+        else:
+            game_release_date = datetime.strptime(release_date_dict["release_date"], "%d.%m.%Y")
+
+        
 
         time_between = game_release_date - time_now
         time_in_seconds = time_between.total_seconds()
