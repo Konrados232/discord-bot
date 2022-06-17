@@ -18,7 +18,7 @@ class SteamListConverter:
         app_list = data["applist"]["apps"]
 
         for app in app_list:
-            base_dict[app["name"]] = app["appid"]
+            base_dict[app["name"].lower()] = app["appid"]
         
         return base_dict
 
