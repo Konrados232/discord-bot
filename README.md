@@ -21,3 +21,8 @@ Future features:
 * !steam info [name] - check game's overall information
 * !release add [name] [date] [info] - add event for tracking
 * !release delete [name] [date] [info] - remove from tracking
+
+#Gallery
+![Discord Bot](https://user-images.githubusercontent.com/25458415/174493596-f65e04ca-434c-448e-a4f8-da757beb8c7f.png)
+
+
