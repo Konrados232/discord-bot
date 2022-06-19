@@ -20,8 +20,8 @@ class HelpCommand(commands.Cog):
         embed.add_field(name="!release add [game name] [date] [publisher]", value="Add game to releases!", inline=False)
         embed.add_field(name="!release delete [game name] [date] [publisher]", value="Delete game from releases!", inline=False)
         embed.add_field(name="!snipe", value="Take a look at recently deleted message!", inline=False)
-        embed.add_field(name="!konradobocie czy [something]", value="What does the bot about [something]?", inline=False)
-        embed.add_field(name="!help", value="You are literally reading this.", inline=False)
+        embed.add_field(name="!konradobocie czy [something]", value="What does the bot think about [something]?", inline=False)
+        embed.add_field(name="!gigahelp", value="You are literally reading this.", inline=False)
 
         return embed
 
