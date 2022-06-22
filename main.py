@@ -1,12 +1,14 @@
 import discord
 from discord.ext import commands
 import json
+from Commands.AvatarCommand import AvatarCommand
 
 from Commands.HLTBCommand import HLTBCommand
 from Commands.HelloCommand import HelloCommand
 from Commands.HelpCommand import HelpCommand
 from Commands.KonradobocieCommand import KonradobocieCommand
 from Commands.KonradobotCommand import KonradobotCommand
+from Commands.MorbinCommand import MorbinCommand
 from Commands.RandomCommand import RandomCommand
 from Commands.ReleaseCommand import ReleaseCommand
 from Commands.SnipeCommand import SnipeCommand
@@ -107,6 +109,10 @@ bot.add_cog(hltb_command)
 steam_command = SteamCommand(bot)
 bot.add_cog(steam_command)
 
+avatar_command = AvatarCommand(bot)
+bot.add_cog(avatar_command)
+
+
 @bot.event
 async def on_ready():
     print(f"We have logged in as {bot.user}")
@@ -145,6 +151,7 @@ async def on_message(message):
         if title is not None:
             message_to_send = waiter.release_date_time(name=title)
             await message.channel.send(f"{message_to_send} {message.author.mention}!")
+
 
     if "konradobocie" in message.content.lower() and "co robiłeś, że cię nie było" in message.content.lower():
         await message.channel.send(f"Czytałem lore Dark Souls")
