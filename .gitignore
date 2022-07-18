@@ -12,3 +12,6 @@ cspell.json
 
 # temporary
 datafiles/
+
+# personal for testing
+test.py

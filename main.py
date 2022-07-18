@@ -8,7 +8,6 @@ from Commands.HelloCommand import HelloCommand
 from Commands.HelpCommand import HelpCommand
 from Commands.KonradobocieCommand import KonradobocieCommand
 from Commands.KonradobotCommand import KonradobotCommand
-from Commands.MorbinCommand import MorbinCommand
 from Commands.RandomCommand import RandomCommand
 from Commands.ReleaseCommand import ReleaseCommand
 from Commands.SnipeCommand import SnipeCommand
